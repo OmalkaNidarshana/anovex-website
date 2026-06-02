@@ -1,120 +1,149 @@
 /**
- * Anovex Technologies — app.js
+ * Anovex Technologies v2 — assets/js/app.js
  */
 
 document.addEventListener("DOMContentLoaded", () => {
 
   /* --------------------------------------------------
-     Smooth scroll for nav anchor links
+     Smooth scroll for anchor links
   -------------------------------------------------- */
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function (e) {
-      const target = document.querySelector(this.getAttribute("href"));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+  document.querySelectorAll('a[href^="#"], button[data-scroll]').forEach(el => {
+    el.addEventListener("click", function () {
+      const href = this.getAttribute("href") || this.dataset.scroll;
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 
   /* --------------------------------------------------
-     Sticky nav: add shadow on scroll
+     Sticky nav shadow on scroll
   -------------------------------------------------- */
   const nav = document.querySelector("nav");
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 40) {
-      nav.style.boxShadow = "0 4px 32px rgba(0,0,0,0.5)";
-    } else {
-      nav.style.boxShadow = "none";
-    }
-  }, { passive: true });
+  const onScroll = () => {
+    nav.style.boxShadow = window.scrollY > 40
+      ? "0 4px 32px rgba(0,0,0,0.6)"
+      : "none";
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   /* --------------------------------------------------
-     Scroll-reveal: fade-up elements as they enter view
+     Active nav pill on section entry
   -------------------------------------------------- */
-  const revealEls = document.querySelectorAll(
-    ".svc, .feat, .team-card, .tech-pill, .about-terminal"
-  );
+  const sections   = document.querySelectorAll("section[id]");
+  const navPills   = document.querySelectorAll(".nav-pill");
+  const sectionMap = { home: 0, services: 1, platform: 2, team: 4 };
 
-  const observer = new IntersectionObserver((entries) => {
+  const sectionObs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("revealed");
-        observer.unobserve(entry.target);
-      }
+      if (!entry.isIntersecting) return;
+      const idx = sectionMap[entry.target.id];
+      navPills.forEach((p, i) => {
+        p.style.color      = i === idx ? "var(--txt)"  : "";
+        p.style.background = i === idx ? "rgba(255,255,255,0.07)" : "";
+      });
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => sectionObs.observe(s));
+
+  /* --------------------------------------------------
+     Scroll-reveal: fade cards/elements in as they enter
+  -------------------------------------------------- */
+  const revealSelectors = [
+    ".svc-card", ".feat-card", ".tm-card",
+    ".kpi-cell", ".t-pill", ".terminal", ".stat-cell"
+  ];
+  const revealEls = document.querySelectorAll(revealSelectors.join(", "));
+
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("revealed");
+      revealObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
 
   revealEls.forEach((el, i) => {
-    el.style.opacity = "0";
+    el.style.opacity   = "0";
     el.style.transform = "translateY(28px)";
-    el.style.transition = `opacity 0.55s ${i * 0.07}s ease, transform 0.55s ${i * 0.07}s ease`;
-    observer.observe(el);
+    el.style.transition = `opacity 0.55s ${(i % 6) * 0.07}s ease, transform 0.55s ${(i % 6) * 0.07}s ease`;
+    revealObs.observe(el);
   });
 
-  document.head.insertAdjacentHTML("beforeend", `
-    <style>.revealed { opacity: 1 !important; transform: translateY(0) !important; }</style>
-  `);
+  const revealStyle = document.createElement("style");
+  revealStyle.textContent = ".revealed { opacity: 1 !important; transform: translateY(0) !important; }";
+  document.head.appendChild(revealStyle);
 
   /* --------------------------------------------------
-     Stat counters — animate numbers in hero
+     Section headers fade up on entry
   -------------------------------------------------- */
-  function animateCounter(el, target, suffix = "", duration = 1600) {
-    let start = 0;
-    const step = (timestamp) => {
-      if (!start) start = timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.floor(eased * target) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
+  const headerEls = document.querySelectorAll(".sec-eyebrow, .sec-h, .sec-p");
+  const headerObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.style.opacity   = "1";
+      entry.target.style.transform = "translateY(0)";
+      headerObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.2 });
+
+  headerEls.forEach((el, i) => {
+    el.style.opacity    = "0";
+    el.style.transform  = "translateY(18px)";
+    el.style.transition = `opacity 0.6s ${i * 0.1}s ease, transform 0.6s ${i * 0.1}s ease`;
+    headerObs.observe(el);
+  });
+
+  /* --------------------------------------------------
+     Counter animation for stat numbers
+  -------------------------------------------------- */
+  function countUp(el, target, suffix, duration = 1400) {
+    let start = null;
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const step = ts => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor(ease(p) * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   }
 
-  const statsObserver = new IntersectionObserver((entries) => {
+  const counterObs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const numEl = entry.target.querySelector(".stat-num");
-        if (numEl) {
-          const raw = numEl.textContent.trim();
-          if (raw.startsWith("4")) {
-            numEl.innerHTML = "";
-            const span = document.createElement("span");
-            numEl.appendChild(span);
-            animateCounter(span, 4, "+");
-          } else if (raw.startsWith("100")) {
-            numEl.innerHTML = "";
-            const span = document.createElement("span");
-            numEl.appendChild(span);
-            animateCounter(span, 100, "%");
-          }
-        }
-        statsObserver.unobserve(entry.target);
-      }
+      if (!entry.isIntersecting) return;
+      const el = entry.target.querySelector(".stat-n");
+      if (!el) return;
+      const raw = el.textContent.trim();
+      if (raw.startsWith("4"))    countUp(el, 4, "+");
+      if (raw.startsWith("99"))   countUp(el, 99.9, "%");
+      if (raw.startsWith("3"))    countUp(el, 3, "×");
+      counterObs.unobserve(entry.target);
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.6 });
 
-  document.querySelectorAll(".stat").forEach(el => statsObserver.observe(el));
+  document.querySelectorAll(".stat-cell").forEach(el => counterObs.observe(el));
 
   /* --------------------------------------------------
-     Nav CTA + hero buttons — ripple effect
+     Ripple effect on all primary buttons
   -------------------------------------------------- */
-  function addRipple(btn) {
+  function attachRipple(btn) {
     btn.addEventListener("click", function (e) {
-      const rect = this.getBoundingClientRect();
+      const rect   = this.getBoundingClientRect();
+      const size   = Math.max(rect.width, rect.height);
       const ripple = document.createElement("span");
-      const size = Math.max(rect.width, rect.height);
-      ripple.style.cssText = `
-        position:absolute;
-        border-radius:50%;
-        width:${size}px; height:${size}px;
-        left:${e.clientX - rect.left - size / 2}px;
-        top:${e.clientY - rect.top - size / 2}px;
-        background:rgba(255,255,255,0.2);
-        transform:scale(0);
-        animation:rippleAnim 0.55s ease-out forwards;
-        pointer-events:none;
-      `;
+      ripple.style.cssText = [
+        "position:absolute",
+        "border-radius:50%",
+        `width:${size}px`,
+        `height:${size}px`,
+        `left:${e.clientX - rect.left - size / 2}px`,
+        `top:${e.clientY - rect.top - size / 2}px`,
+        "background:rgba(255,255,255,0.18)",
+        "transform:scale(0)",
+        "animation:rippleOut 0.55s ease-out forwards",
+        "pointer-events:none"
+      ].join(";");
       this.style.position = "relative";
       this.style.overflow = "hidden";
       this.appendChild(ripple);
@@ -122,44 +151,67 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.head.insertAdjacentHTML("beforeend", `
-    <style>
-      @keyframes rippleAnim {
-        to { transform: scale(2.5); opacity: 0; }
-      }
-    </style>
-  `);
+  const rippleStyle = document.createElement("style");
+  rippleStyle.textContent = "@keyframes rippleOut { to { transform: scale(2.6); opacity: 0; } }";
+  document.head.appendChild(rippleStyle);
 
-  document.querySelectorAll(".btn-p, .btn-g, .nav-cta").forEach(addRipple);
+  document.querySelectorAll(".cta-main, .cta-sec, .nav-btn, .cta-input-btn").forEach(attachRipple);
 
   /* --------------------------------------------------
-     Active nav link highlight on scroll
+     CTA email form — basic validation feedback
   -------------------------------------------------- */
-  const sections = document.querySelectorAll("section[id]");
-  const navAnchors = document.querySelectorAll(".nav-links a");
+  const ctaInput = document.querySelector(".cta-input");
+  const ctaBtn   = document.querySelector(".cta-input-btn");
 
-  const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navAnchors.forEach(a => a.style.color = "");
-        const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
-        if (active) active.style.color = "var(--acc)";
+  if (ctaInput && ctaBtn) {
+    ctaBtn.addEventListener("click", () => {
+      const val = ctaInput.value.trim();
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+      if (!valid) {
+        ctaInput.style.borderColor = "rgba(255,80,80,0.5)";
+        ctaInput.focus();
+        setTimeout(() => (ctaInput.style.borderColor = ""), 2000);
+        return;
       }
+
+      ctaBtn.textContent = "✓ You're in!";
+      ctaBtn.style.background = "var(--acc2)";
+      ctaInput.disabled = true;
+      ctaBtn.disabled   = true;
+      setTimeout(() => {
+        ctaBtn.textContent     = "Get Started";
+        ctaBtn.style.background = "";
+        ctaInput.value         = "";
+        ctaInput.disabled      = false;
+        ctaBtn.disabled        = false;
+      }, 3500);
     });
-  }, { threshold: 0.4 });
 
-  sections.forEach(s => sectionObserver.observe(s));
+    ctaInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") ctaBtn.click();
+    });
+  }
 
   /* --------------------------------------------------
-     Social button click — placeholder feedback
+     Social button press feedback
   -------------------------------------------------- */
-  document.querySelectorAll(".social-btn").forEach(btn => {
+  document.querySelectorAll(".s-btn").forEach(btn => {
     btn.addEventListener("click", function () {
-      const label = this.getAttribute("aria-label") || "Link";
-      this.style.background = "rgba(0,180,255,0.2)";
+      this.style.background = "rgba(79,143,255,0.2)";
       setTimeout(() => (this.style.background = ""), 400);
     });
   });
 
-  console.log("Anovex Technologies — loaded ✓");
+  /* --------------------------------------------------
+     Announcement band close (optional UX touch)
+  -------------------------------------------------- */
+  const band = document.querySelector(".band");
+  if (band) {
+    band.addEventListener("click", function (e) {
+      if (e.target.classList.contains("band-link") || e.target.closest(".band-link")) return;
+    });
+  }
+
+  console.log("%cAnovex Technologies v2 — loaded ✓", "color:#4f8fff;font-weight:700;font-size:14px");
 });
