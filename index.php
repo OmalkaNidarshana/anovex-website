@@ -9,7 +9,7 @@
 <header>
 <div class="logo">A <?=$company?></div>
 <nav>
-<a href="#services">Servicessssss</a>
+<a href="#services">Services</a>
 <a href="#team">Team</a>
 </nav>
 </header>
