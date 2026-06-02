@@ -9,7 +9,7 @@
 <header>
 <div class="logo">A <?=$company?></div>
 <nav>
-<a href="#services">Services</a>
+<a href="#services">Servicessssss</a>
 <a href="#team">Team</a>
 </nav>
 </header>
@@ -19,7 +19,6 @@
 <p>ERP • GovTech • AI • Analytics</p>
 <button>Explore</button>
 </section>
-`
 
 <section id="services">
 <h2>Services</h2>
