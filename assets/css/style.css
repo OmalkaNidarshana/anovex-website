@@ -1,0 +1,5 @@
+body{background:#07111f;color:white;font-family:Arial;margin:0}
+header{display:flex;justify-content:space-between;padding:20px;background:#0f1f33;position:sticky;top:0}
+.hero{text-align:center;padding:100px}
+.card{background:#0f1f33;padding:20px;margin:10px;border-radius:10px;transition:.3s}
+.card:hover{transform:translateY(-5px)}
