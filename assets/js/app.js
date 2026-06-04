@@ -177,5 +177,101 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
   });
 
+
+  /* --------------------------------------------------
+     Proposal Form — AJAX submit to contact.php
+  -------------------------------------------------- */
+  const form        = document.getElementById("proposalForm");
+  const submitBtn   = document.getElementById("submitBtn");
+  const successBox  = document.getElementById("formSuccess");
+  const successMsg  = document.getElementById("formSuccessMsg");
+  const errorBox    = document.getElementById("formError");
+  const errorMsg    = document.getElementById("formErrorMsg");
+  const textarea    = document.getElementById("pf-message");
+  const charCount   = document.getElementById("charCount");
+  const MAX_CHARS   = 2000;
+
+  /* Live character counter */
+  if (textarea && charCount) {
+    textarea.addEventListener("input", () => {
+      const len = textarea.value.length;
+      charCount.textContent = len;
+      const parent = charCount.closest(".char-count");
+      parent.classList.toggle("near-limit", len > MAX_CHARS * 0.85 && len <= MAX_CHARS);
+      parent.classList.toggle("at-limit", len > MAX_CHARS);
+      if (len > MAX_CHARS) textarea.value = textarea.value.slice(0, MAX_CHARS);
+    });
+  }
+
+  /* Field-level validation highlight */
+  function validateField(field) {
+    const ok = field.checkValidity() && field.value.trim() !== "";
+    field.classList.toggle("field-error", !ok);
+    return ok;
+  }
+
+  /* Hide alerts helper */
+  function hideAlerts() {
+    errorBox.style.display  = "none";
+    successBox.style.display = "none";
+  }
+
+  if (form) {
+    /* Validate on blur */
+    form.querySelectorAll("input[required], textarea[required]").forEach(f => {
+      f.addEventListener("blur", () => validateField(f));
+      f.addEventListener("input", () => {
+        if (f.classList.contains("field-error")) validateField(f);
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlerts();
+
+      /* Client-side validation */
+      const required = [...form.querySelectorAll("[required]")];
+      const allValid = required.every(f => validateField(f));
+      if (!allValid) {
+        errorMsg.textContent = "Please fill in all required fields correctly.";
+        errorBox.style.display = "flex";
+        errorBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        return;
+      }
+
+      /* Loading state */
+      submitBtn.disabled = true;
+      submitBtn.querySelector(".btn-label").style.display = "none";
+      submitBtn.querySelector(".btn-loading").style.display = "inline-flex";
+
+      try {
+        const res  = await fetch("contact.php", {
+          method:  "POST",
+          body:    new FormData(form),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          form.reset();
+          if (charCount) charCount.textContent = "0";
+          successMsg.textContent    = data.message;
+          successBox.style.display  = "block";
+          successBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else {
+          errorMsg.textContent    = data.message;
+          errorBox.style.display  = "flex";
+          errorBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      } catch (err) {
+        errorMsg.textContent    = "Network error. Please email us directly at info@anovextechnologies.net.";
+        errorBox.style.display  = "flex";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.querySelector(".btn-label").style.display = "inline-flex";
+        submitBtn.querySelector(".btn-loading").style.display = "none";
+      }
+    });
+  }
+
   console.log("%cAnovex Technologies v4 loaded ✓", "color:#00d4ff;font-weight:700;font-size:13px");
 });

@@ -6,6 +6,7 @@ $nav_items = [
     ["label" => "Services",  "dropdown" => true,  "href" => "#services"],
     ["label" => "Ecosystem", "dropdown" => true,  "href" => "#ecosystem"],
     ["label" => "Our Tech",  "dropdown" => false, "href" => "#tech"],
+    ["label" => "Contact",   "dropdown" => false, "href" => "#contact"],
 ];
 
 $hero = [
@@ -118,7 +119,7 @@ $social_icons = [
       </a>
     <?php endforeach; ?>
   </nav>
-  <button class="contact-btn">Contact Us</button>
+  <a href="#contact" class="contact-btn">Contact Us</a>
   <button class="nav-burger" aria-label="Menu" id="burger">
     <i class="ti ti-menu-2"></i>
   </button>
@@ -296,6 +297,182 @@ $social_icons = [
       </div>
     <?php endforeach; ?>
   </div>
+</section>
+
+
+<!-- ═══════════════════════════════
+     SECTION 6 — CONTACT / PROPOSAL
+═══════════════════════════════ -->
+<section class="page-section contact-section" id="contact">
+  <div class="section-header">
+    <div class="sh-line"></div>
+    <div class="sh-text">
+      <p class="sec-eyebrow">Work with us</p>
+      <h2 class="sec-title">Submit Your Proposal</h2>
+    </div>
+    <div class="sh-line"></div>
+  </div>
+
+  <div class="contact-wrap">
+
+    <!-- Left: info panel -->
+    <div class="contact-info">
+      <div class="ci-badge">
+        <i class="ti ti-mail" aria-hidden="true"></i>
+        <span>info@anovextechnologies.net</span>
+      </div>
+      <h3 class="ci-heading">Let's build something extraordinary together</h3>
+      <p class="ci-desc">Tell us about your enterprise challenge. Whether it's AI automation, ERP deployment, GovTech infrastructure, or data analytics — our team is ready to engineer the solution.</p>
+
+      <ul class="ci-steps">
+        <li>
+          <div class="ci-step-num">01</div>
+          <div>
+            <div class="ci-step-title">Submit your proposal</div>
+            <div class="ci-step-desc">Fill in the form with your project details.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ci-step-num">02</div>
+          <div>
+            <div class="ci-step-title">We review & respond</div>
+            <div class="ci-step-desc">Our team gets back to you within 24 hours.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ci-step-num">03</div>
+          <div>
+            <div class="ci-step-title">Discovery call</div>
+            <div class="ci-step-desc">A focused 30-min call to scope the project.</div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="ci-direct">
+        <div class="ci-direct-label">Or reach us directly</div>
+        <a href="mailto:info@anovextechnologies.net" class="ci-email">
+          <i class="ti ti-mail" aria-hidden="true"></i>
+          info@anovextechnologies.net
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: form -->
+    <div class="contact-form-wrap">
+      <div id="formSuccess" class="form-success" style="display:none" aria-live="polite">
+        <div class="fs-icon"><i class="ti ti-circle-check"></i></div>
+        <h4>Proposal Received!</h4>
+        <p id="formSuccessMsg"></p>
+      </div>
+
+      <div id="formError" class="form-error" style="display:none" aria-live="assertive">
+        <i class="ti ti-alert-circle"></i>
+        <span id="formErrorMsg"></span>
+      </div>
+
+      <form id="proposalForm" class="proposal-form" novalidate>
+        <!-- Honeypot -->
+        <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pf-name">Full Name <span class="req">*</span></label>
+            <input type="text" id="pf-name" name="name" placeholder="Garumuni Omalka" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="pf-email">Work Email <span class="req">*</span></label>
+            <input type="email" id="pf-email" name="email" placeholder="you@company.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pf-company">Company / Organisation</label>
+            <input type="text" id="pf-company" name="company" placeholder="Anovex Technologies" autocomplete="organization">
+          </div>
+          <div class="form-group">
+            <label for="pf-phone">Phone Number</label>
+            <input type="tel" id="pf-phone" name="phone" placeholder="+94 77 000 0000" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pf-service">Service Interest</label>
+            <div class="select-wrap">
+              <select id="pf-service" name="service">
+                <option value="">— Select a service —</option>
+                <option>AI-Powered Enterprise Automation</option>
+                <option>AI + ERP + Business Operating Systems</option>
+                <option>GovTech &amp; Digital Transformation</option>
+                <option>AI Data Analytics</option>
+                <option>Multiple / Full Platform</option>
+                <option>Other</option>
+              </select>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pf-budget">Estimated Budget</label>
+            <div class="select-wrap">
+              <select id="pf-budget" name="budget">
+                <option value="">— Select range —</option>
+                <option>Under $10,000</option>
+                <option>$10,000 – $50,000</option>
+                <option>$50,000 – $150,000</option>
+                <option>$150,000 – $500,000</option>
+                <option>$500,000+</option>
+                <option>To be discussed</option>
+              </select>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pf-timeline">Project Timeline</label>
+          <div class="select-wrap">
+            <select id="pf-timeline" name="timeline">
+              <option value="">— Select timeline —</option>
+              <option>ASAP / Urgent</option>
+              <option>Within 1 month</option>
+              <option>1 – 3 months</option>
+              <option>3 – 6 months</option>
+              <option>6 – 12 months</option>
+              <option>Long-term engagement</option>
+            </select>
+            <i class="ti ti-chevron-down" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pf-message">Project Description <span class="req">*</span></label>
+          <textarea id="pf-message" name="message" rows="5"
+            placeholder="Describe your project, goals, challenges, and what you're looking to achieve with Anovex Technologies…"
+            required></textarea>
+          <div class="char-count"><span id="charCount">0</span> / 2000</div>
+        </div>
+
+        <div class="form-footer">
+          <p class="form-privacy">
+            <i class="ti ti-lock" aria-hidden="true"></i>
+            Your information is kept confidential and will only be used to respond to your proposal.
+          </p>
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-label">
+              <i class="ti ti-send" aria-hidden="true"></i>
+              Send Proposal
+            </span>
+            <span class="btn-loading" style="display:none">
+              <i class="ti ti-loader" aria-hidden="true"></i>
+              Sending…
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div><!-- /contact-wrap -->
 </section>
 
 <!-- ═══════════════════════════════
