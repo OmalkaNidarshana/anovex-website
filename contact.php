@@ -26,7 +26,8 @@ function clean(string $v): string {
     return htmlspecialchars(trim(strip_tags($v)), ENT_QUOTES, 'UTF-8');
 }
 
-$to          = 'info@anovextechnologies.net';
+//$to          = 'info@anovextechnologies.net';
+$to          = 'omalkanidarshana@gmail.com';
 $name        = clean($_POST['name']        ?? '');
 $email       = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
 $company     = clean($_POST['company']     ?? '');
