@@ -377,7 +377,7 @@ $social_icons = [
         <div class="form-row">
           <div class="form-group">
             <label for="pf-name">Full Name <span class="req">*</span></label>
-            <input type="text" id="pf-name" name="name" placeholder="Garumuni Omalka" required autocomplete="name">
+            <input type="text" id="pf-name" name="name" placeholder="Personal Name" required autocomplete="name">
           </div>
           <div class="form-group">
             <label for="pf-email">Work Email <span class="req">*</span></label>
@@ -388,7 +388,7 @@ $social_icons = [
         <div class="form-row">
           <div class="form-group">
             <label for="pf-company">Company / Organisation</label>
-            <input type="text" id="pf-company" name="company" placeholder="Anovex Technologies" autocomplete="organization">
+            <input type="text" id="pf-company" name="company" placeholder="Company/Organization Name" autocomplete="organization">
           </div>
           <div class="form-group">
             <label for="pf-phone">Phone Number</label>
