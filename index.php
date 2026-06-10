@@ -93,6 +93,13 @@ $social_icons = [
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($company) ?></title>
+  <meta name="description" content="Anovex Technologies — AI-Powered Enterprise Solutions. ERP, GovTech, AI Automation & Data Analytics.">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo-mark.svg">
+  <link rel="shortcut icon" href="assets/img/logo-mark.svg">
+  <meta property="og:title" content="Anovex Technologies">
+  <meta property="og:description" content="AI-Powered Enterprise Solutions — ERP, GovTech, AI Automation & Analytics.">
+  <meta property="og:image" content="assets/img/logo.svg">
+  <meta property="og:type" content="website">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,10 +112,9 @@ $social_icons = [
      STICKY NAV
 ═══════════════════════════════ -->
 <header class="site-nav" id="top">
-  <div class="nav-brand">
-    <div class="brand-logo"><span class="ba">ANOV</span><span class="bx">EX</span></div>
-    <div class="brand-sub">TECHNOLOGIES</div>
-  </div>
+  <a href="#home" class="nav-brand" aria-label="Anovex Technologies home">
+    <img src="assets/img/logo.svg" alt="Anovex Technologies" class="nav-logo-img">
+  </a>
   <nav class="nav-links" aria-label="Primary navigation">
     <?php foreach ($nav_items as $item): ?>
       <a href="<?= htmlspecialchars($item['href']) ?>" class="nav-link">
@@ -134,6 +140,7 @@ $social_icons = [
     <div class="grid-layer"></div>
     <div class="particles" id="particles"></div>
     <div class="scan-line" id="scanLine"></div>
+    <img src="assets/img/logo-mark.svg" class="hero-mark" aria-hidden="true" alt="">
   </div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Enterprise &bull; GovTech &bull; AI &bull; Analytics</p>
@@ -377,7 +384,7 @@ $social_icons = [
         <div class="form-row">
           <div class="form-group">
             <label for="pf-name">Full Name <span class="req">*</span></label>
-            <input type="text" id="pf-name" name="name" placeholder="Personal Name" required autocomplete="name">
+            <input type="text" id="pf-name" name="name" placeholder="Garumuni Omalka" required autocomplete="name">
           </div>
           <div class="form-group">
             <label for="pf-email">Work Email <span class="req">*</span></label>
@@ -388,7 +395,7 @@ $social_icons = [
         <div class="form-row">
           <div class="form-group">
             <label for="pf-company">Company / Organisation</label>
-            <input type="text" id="pf-company" name="company" placeholder="Company/Organization Name" autocomplete="organization">
+            <input type="text" id="pf-company" name="company" placeholder="Anovex Technologies" autocomplete="organization">
           </div>
           <div class="form-group">
             <label for="pf-phone">Phone Number</label>
@@ -481,8 +488,7 @@ $social_icons = [
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="brand-logo"><span class="ba">ANOV</span><span class="bx">EX</span></div>
-      <div class="brand-sub">TECHNOLOGIES</div>
+      <img src="assets/img/logo.svg" alt="Anovex Technologies" class="footer-logo-img">
       <p class="footer-tagline">Next-generation AI &amp; enterprise infrastructure.</p>
     </div>
     <nav class="footer-links" aria-label="Footer navigation">

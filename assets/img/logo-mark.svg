@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Anovex Technologies mark">
+  <title>Anovex Technologies</title>
+  <defs>
+    <linearGradient id="lgi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#1e78ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#060c18"/>
+  <!-- outer hex ring -->
+  <polygon points="32,6 52,17 52,39 32,50 12,39 12,17"
+    fill="none" stroke="#1e78ff" stroke-width="1" opacity="0.35"/>
+  <!-- main hex -->
+  <polygon points="32,10 48,19 48,37 32,46 16,37 16,19"
+    fill="#1e78ff" fill-opacity="0.12"
+    stroke="url(#lgi)" stroke-width="2"/>
+  <!-- cross -->
+  <line x1="32" y1="12" x2="32" y2="44" stroke="#00d4ff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="17" y1="21" x2="47" y2="37" stroke="#1e78ff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="47" y1="21" x2="17" y2="37" stroke="#1e78ff" stroke-width="1.2" opacity="0.6"/>
+  <!-- centre node -->
+  <circle cx="32" cy="28" r="8"   fill="url(#lgi)"/>
+  <circle cx="32" cy="28" r="4"   fill="#060c18"/>
+  <circle cx="32" cy="28" r="1.6" fill="#00d4ff"/>
+  <!-- vertex dots -->
+  <circle cx="32" cy="10" r="2.2" fill="#00d4ff" opacity="0.9"/>
+  <circle cx="48" cy="19" r="2.2" fill="#1e78ff" opacity="0.8"/>
+  <circle cx="48" cy="37" r="2.2" fill="#1e78ff" opacity="0.8"/>
+  <circle cx="32" cy="46" r="2.2" fill="#00d4ff" opacity="0.9"/>
+  <circle cx="16" cy="37" r="2.2" fill="#1e78ff" opacity="0.8"/>
+  <circle cx="16" cy="19" r="2.2" fill="#1e78ff" opacity="0.8"/>
+  <!-- arm traces -->
+  <line x1="48" y1="28" x2="58" y2="28" stroke="#1e78ff" stroke-width="1.2" opacity="0.4"/>
+  <circle cx="60" cy="28" r="1.8" fill="#1e78ff" opacity="0.4"/>
+  <line x1="16" y1="28" x2="6"  y2="28" stroke="#1e78ff" stroke-width="1.2" opacity="0.4"/>
+  <circle cx="4"  cy="28" r="1.8" fill="#1e78ff" opacity="0.4"/>
+</svg>

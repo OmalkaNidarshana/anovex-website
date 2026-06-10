@@ -1239,3 +1239,41 @@ body {
   .submit-btn     { width: 100%; justify-content: center; }
   .contact-form-wrap { padding: 1.5rem 1.25rem; }
 }
+
+/* ============================================================
+   LOGO — SVG image sizing
+   ============================================================ */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.nav-logo-img {
+  height: 52px;
+  width: auto;
+  display: block;
+  /* SVG has dark bg baked in, so keep as-is */
+}
+.footer-logo-img {
+  height: 64px;
+  width: auto;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* Remove old text-brand styles that are now unused */
+.nav-brand .brand-logo,
+.nav-brand .brand-sub { display: none; }
+
+/* ── hero section logo watermark (optional large bg mark) ── */
+.hero-mark {
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 480px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}

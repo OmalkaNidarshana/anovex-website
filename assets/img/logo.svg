@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-label="Anovex Technologies">
+  <title>Anovex Technologies</title>
+  <defs>
+    <linearGradient id="lgm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#1e78ff"/>
+    </linearGradient>
+    <linearGradient id="lgw" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e8f0ff"/>
+      <stop offset="55%" stop-color="#e8f0ff"/>
+      <stop offset="100%" stop-color="#00d4ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Hex mark ── -->
+  <!-- outer ring -->
+  <polygon points="30,10 50,0 70,10 70,30 50,40 30,30"
+    fill="none" stroke="#1e78ff" stroke-width="1" opacity="0.3"/>
+  <!-- main hex -->
+  <polygon points="33,12 50,3 67,12 67,28 50,37 33,28"
+    fill="#1e78ff" fill-opacity="0.1"
+    stroke="url(#lgm)" stroke-width="1.5"/>
+  <!-- inner cross -->
+  <line x1="50" y1="5"  x2="50" y2="35" stroke="#00d4ff" stroke-width="0.9" opacity="0.55"/>
+  <line x1="34" y1="14" x2="66" y2="26" stroke="#1e78ff" stroke-width="0.9" opacity="0.55"/>
+  <line x1="66" y1="14" x2="34" y2="26" stroke="#1e78ff" stroke-width="0.9" opacity="0.55"/>
+  <!-- centre node -->
+  <circle cx="50" cy="20" r="6"   fill="url(#lgm)"/>
+  <circle cx="50" cy="20" r="2.8" fill="#060c18"/>
+  <circle cx="50" cy="20" r="1.1" fill="#00d4ff"/>
+  <!-- vertex dots -->
+  <circle cx="50" cy="3"  r="1.8" fill="#00d4ff" opacity="0.85"/>
+  <circle cx="67" cy="12" r="1.8" fill="#1e78ff" opacity="0.75"/>
+  <circle cx="67" cy="28" r="1.8" fill="#1e78ff" opacity="0.75"/>
+  <circle cx="50" cy="37" r="1.8" fill="#00d4ff" opacity="0.85"/>
+  <circle cx="33" cy="28" r="1.8" fill="#1e78ff" opacity="0.75"/>
+  <circle cx="33" cy="12" r="1.8" fill="#1e78ff" opacity="0.75"/>
+  <!-- trace arms -->
+  <line x1="70" y1="20" x2="80" y2="20" stroke="#1e78ff" stroke-width="0.9" opacity="0.4"/>
+  <circle cx="82" cy="20" r="1.4" fill="#1e78ff" opacity="0.4"/>
+
+  <!-- ── ANOVEX wordmark ── -->
+  <text x="90" y="32"
+    font-family="'Rajdhani','Arial Black',Impact,sans-serif"
+    font-size="32" font-weight="700"
+    letter-spacing="2"
+    fill="url(#lgw)">ANOV<tspan fill="#00d4ff">EX</tspan></text>
+
+  <!-- ── TECHNOLOGIES subtitle ── -->
+  <!-- flanking accent lines -->
+  <line x1="90"  y1="44" x2="106" y2="44" stroke="#1e78ff" stroke-width="0.8" opacity="0.45"/>
+  <line x1="288" y1="44" x2="306" y2="44" stroke="#00d4ff" stroke-width="0.8" opacity="0.45"/>
+  <text x="112" y="54"
+    font-family="'Exo 2','Arial',Helvetica,sans-serif"
+    font-size="7" font-weight="400"
+    letter-spacing="5"
+    fill="#4a6280">TECHNOLOGIES</text>
+
+  <!-- ── bottom rule ── -->
+  <line x1="90" y1="62" x2="310" y2="62" stroke="#1e2d42" stroke-width="0.5" opacity="0.6"/>
+  <text x="90" y="72"
+    font-family="'Exo 2','Arial',Helvetica,sans-serif"
+    font-size="6" font-weight="300"
+    letter-spacing="2.5"
+    fill="#2a3f5a">AI  ·  ERP  ·  GOVTECH  ·  ANALYTICS</text>
+</svg>
