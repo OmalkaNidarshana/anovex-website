@@ -1,31 +1,38 @@
 <?php
 /**
  * Anovex Technologies - contact.php
- * Proposal form mailer with PHPMailer + mail() fallbacks
+ * On form submit:
+ *   Email 1 → admin (proposal details)
+ *   Email 2 → customer (thank-you auto-reply)
  */
 
 header('Content-Type: application/json');
 
-/* POST only */
+/* ── POST only ── */
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed.']);
     exit;
 }
 
-/* Honeypot spam trap */
+/* ── Honeypot ── */
 if (!empty($_POST['website'])) {
     echo json_encode(['success' => true, 'message' => 'Thank you!']);
     exit;
 }
 
-/* Sanitise helper */
+/* ── Sanitise ── */
 function clean(string $v): string {
     return htmlspecialchars(trim(strip_tags($v)), ENT_QUOTES, 'UTF-8');
 }
 
-/* Collect fields */
-$to       = 'omalkanidarshana@gmail.com'; // change to info@anovextechnologies.net when live
+/* ── Config ── */
+$adminEmail   = 'omalkanidarshana@gmail.com'; // change to info@anovextechnologies.net when live
+$fromAddress  = 'noreply@anovextechnologies.net';
+$fromName     = 'Anovex Technologies';
+$siteUrl      = 'https://anovextechnologies.com';
+
+/* ── Collect fields ── */
 $name     = clean($_POST['name']     ?? '');
 $email    = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
 $company  = clean($_POST['company']  ?? '');
@@ -35,7 +42,7 @@ $budget   = clean($_POST['budget']   ?? '');
 $timeline = clean($_POST['timeline'] ?? '');
 $message  = clean($_POST['message']  ?? '');
 
-/* Validate */
+/* ── Validate ── */
 $errors = [];
 if (empty($name))                               $errors[] = 'Name is required.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'A valid email is required.';
@@ -47,181 +54,232 @@ if ($errors) {
     exit;
 }
 
-/* Subject */
-$subject = 'New Proposal from ' . $name . ($company ? ' (' . $company . ')' : '');
-
-/* Plain text body — built with concatenation, no heredoc */
-$submitted = date('d M Y H:i:s') . ' UTC';
+/* ── Shared values ── */
+$co        = $company  ?: '—';
+$ph        = $phone    ?: '—';
+$sv        = $service  ?: '—';
+$bg        = $budget   ?: '—';
+$tl        = $timeline ?: '—';
+$submitted = date('d M Y, H:i') . ' UTC';
 $ip        = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-
-$plain  = "ANOVEX TECHNOLOGIES - NEW PROPOSAL\n";
-$plain .= "====================================\n\n";
-$plain .= "CONTACT\n";
-$plain .= "  Name     : " . $name    . "\n";
-$plain .= "  Email    : " . $email   . "\n";
-$plain .= "  Company  : " . $company . "\n";
-$plain .= "  Phone    : " . $phone   . "\n\n";
-$plain .= "PROJECT DETAILS\n";
-$plain .= "  Service  : " . $service  . "\n";
-$plain .= "  Budget   : " . $budget   . "\n";
-$plain .= "  Timeline : " . $timeline . "\n\n";
-$plain .= "MESSAGE\n";
-$plain .= $message . "\n\n";
-$plain .= "====================================\n";
-$plain .= "Submitted : " . $submitted . "\n";
-$plain .= "IP        : " . $ip        . "\n";
-
-/* HTML email body */
-$co  = $company  ?: '&mdash;';
-$ph  = $phone    ?: '&mdash;';
-$sv  = $service  ?: '&mdash;';
-$bg  = $budget   ?: '&mdash;';
-$tl  = $timeline ?: '&mdash;';
-$msg = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
-$dt  = date('d M Y, H:i');
-
-$html  = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
-$html .= '<style>';
-$html .= 'body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:0;}';
-$html .= '.wrap{max-width:600px;margin:30px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.1);}';
-$html .= '.hdr{background:#060c18;padding:24px 28px;text-align:center;}';
-$html .= '.hdr h1{font-size:18px;color:#00d4ff;margin:0;letter-spacing:2px;}';
-$html .= '.hdr p{font-size:11px;color:#6a82a8;margin:4px 0 0;letter-spacing:3px;}';
-$html .= '.bd{padding:24px 28px;}';
-$html .= '.sec{margin-bottom:20px;}';
-$html .= '.st{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1e78ff;border-bottom:1px solid #eef;padding-bottom:5px;margin:0 0 10px;}';
-$html .= '.row{display:flex;gap:14px;margin-bottom:8px;flex-wrap:wrap;}';
-$html .= '.f{flex:1;min-width:120px;}';
-$html .= '.lb{font-size:11px;color:#999;margin-bottom:2px;}';
-$html .= '.vl{font-size:13px;color:#222;font-weight:600;}';
-$html .= '.msg{background:#f8faff;border-left:3px solid #1e78ff;padding:12px 14px;font-size:13px;line-height:1.7;color:#333;border-radius:0 5px 5px 0;white-space:pre-wrap;}';
-$html .= '.ftr{background:#f0f4ff;padding:14px 28px;text-align:center;font-size:11px;color:#aaa;}';
-$html .= '</style></head><body>';
-$html .= '<div class="wrap">';
-$html .= '<div class="hdr"><h1>ANOVEX TECHNOLOGIES</h1><p>NEW PROPOSAL SUBMISSION</p></div>';
-$html .= '<div class="bd">';
-$html .= '<div class="sec"><div class="st">Contact</div>';
-$html .= '<div class="row">';
-$html .= '<div class="f"><div class="lb">Name</div><div class="vl">'  . $name  . '</div></div>';
-$html .= '<div class="f"><div class="lb">Email</div><div class="vl"><a href="mailto:' . $email . '" style="color:#1e78ff">' . $email . '</a></div></div>';
-$html .= '</div>';
-$html .= '<div class="row">';
-$html .= '<div class="f"><div class="lb">Company</div><div class="vl">' . $co . '</div></div>';
-$html .= '<div class="f"><div class="lb">Phone</div><div class="vl">'   . $ph . '</div></div>';
-$html .= '</div></div>';
-$html .= '<div class="sec"><div class="st">Project Details</div>';
-$html .= '<div class="row">';
-$html .= '<div class="f"><div class="lb">Service</div><div class="vl">' . $sv . '</div></div>';
-$html .= '<div class="f"><div class="lb">Budget</div><div class="vl">'  . $bg . '</div></div>';
-$html .= '</div>';
-$html .= '<div class="row"><div class="f"><div class="lb">Timeline</div><div class="vl">' . $tl . '</div></div></div>';
-$html .= '</div>';
-$html .= '<div class="sec"><div class="st">Description</div>';
-$html .= '<div class="msg">' . $msg . '</div>';
-$html .= '</div>';
-$html .= '</div>';
-$html .= '<div class="ftr">Submitted ' . $dt . ' UTC &nbsp;&middot;&nbsp; anovextechnologies.com</div>';
-$html .= '</div></body></html>';
+$msgHtml   = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
 
 /* ================================================================
-   SEND — three methods tried in order
-   1. PHPMailer via SMTP  (most reliable, needs composer install)
-   2. mail() plain text   (simple fallback)
-   3. mail() MIME         (full html+plain fallback)
+   HELPER — send a dual-part (plain + HTML) email
    ================================================================ */
+function sendEmail(
+    string $to,
+    string $toName,
+    string $fromAddr,
+    string $fromName,
+    string $replyTo,
+    string $replyName,
+    string $subject,
+    string $plain,
+    string $html
+): bool {
+    $b    = 'bnd_' . md5(uniqid('', true));
+    $hdrs  = 'From: ' . $fromName . ' <' . $fromAddr . ">\r\n";
+    $hdrs .= 'Reply-To: ' . $replyName . ' <' . $replyTo . ">\r\n";
+    $hdrs .= "MIME-Version: 1.0\r\n";
+    $hdrs .= 'Content-Type: multipart/alternative; boundary="' . $b . "\"\r\n";
+    $hdrs .= 'X-Mailer: PHP/' . phpversion();
 
-$sent      = false;
-$sendError = '';
-
-/* Method 1: PHPMailer */
-$autoload = __DIR__ . '/vendor/autoload.php';
-if (file_exists($autoload)) {
-    require $autoload;
-    try {
-        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-        $mail->isSMTP();
-        $mail->Host       = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = defined('SMTP_USER') ? SMTP_USER : $to;
-        $mail->Password   = defined('SMTP_PASS') ? SMTP_PASS : '';
-        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = defined('SMTP_PORT') ? SMTP_PORT : 587;
-        $mail->setFrom('noreply@anovextechnologies.net', 'Anovex Web');
-        $mail->addAddress($to);
-        $mail->addReplyTo($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = $plain;
-        $mail->send();
-        $sent = true;
-    } catch (Exception $e) {
-        $sendError = 'PHPMailer: ' . $e->getMessage();
-    }
-}
-
-/* Method 2: Simple plain-text mail() */
-if (!$sent) {
-    $h2  = "From: noreply@anovextechnologies.net\r\n";
-    $h2 .= "Reply-To: " . $email . "\r\n";
-    $h2 .= "Content-Type: text/plain; charset=UTF-8\r\n";
-    $h2 .= "X-Mailer: PHP/" . phpversion();
-    if (@mail($to, $subject, $plain, $h2)) {
-        $sent = true;
-    } else {
-        $err = error_get_last();
-        $sendError .= ' | plain mail(): ' . ($err['message'] ?? 'unknown');
-    }
-}
-
-/* Method 3: Full MIME mail() */
-if (!$sent) {
-    $b   = 'bnd_' . md5(uniqid('', true));
-    $h3  = "From: noreply@anovextechnologies.net\r\n";
-    $h3 .= "Reply-To: " . $email . "\r\n";
-    $h3 .= "MIME-Version: 1.0\r\n";
-    $h3 .= "Content-Type: multipart/alternative; boundary=\"" . $b . "\"\r\n";
-    $h3 .= "X-Mailer: PHP/" . phpversion();
-
-    $body  = "--" . $b . "\r\n";
-    $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
-    $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+    $body  = '--' . $b . "\r\n";
+    $body .= "Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n";
     $body .= $plain . "\r\n";
-    $body .= "--" . $b . "\r\n";
-    $body .= "Content-Type: text/html; charset=UTF-8\r\n";
-    $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+    $body .= '--' . $b . "\r\n";
+    $body .= "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n";
     $body .= $html . "\r\n";
-    $body .= "--" . $b . "--";
+    $body .= '--' . $b . '--';
 
-    if (@mail($to, $subject, $body, $h3)) {
-        $sent = true;
-    } else {
-        $err = error_get_last();
-        $sendError .= ' | MIME mail(): ' . ($err['message'] ?? 'unknown');
-    }
+    return @mail($to, $subject, $body, $hdrs);
 }
 
-/* Log failures */
-if (!$sent) {
-    $log = __DIR__ . '/mail_debug.log';
-    $entry = date('[Y-m-d H:i:s]') . ' FAILED to:' . $to . ' from:' . $email . ' err:' . $sendError . "\n";
+/* ================================================================
+   EMAIL 1 — ADMIN NOTIFICATION (proposal details)
+   ================================================================ */
+$adminSubject = 'New Proposal: ' . $name . ($company ? ' (' . $company . ')' : '');
+
+/* plain */
+$adminPlain  = "ANOVEX TECHNOLOGIES — NEW PROPOSAL\n";
+$adminPlain .= str_repeat('=', 40) . "\n\n";
+$adminPlain .= "CONTACT\n";
+$adminPlain .= "  Name     : " . $name    . "\n";
+$adminPlain .= "  Email    : " . $email   . "\n";
+$adminPlain .= "  Company  : " . $co      . "\n";
+$adminPlain .= "  Phone    : " . $ph      . "\n\n";
+$adminPlain .= "PROJECT DETAILS\n";
+$adminPlain .= "  Service  : " . $sv      . "\n";
+$adminPlain .= "  Budget   : " . $bg      . "\n";
+$adminPlain .= "  Timeline : " . $tl      . "\n\n";
+$adminPlain .= "MESSAGE\n" . $message . "\n\n";
+$adminPlain .= str_repeat('=', 40) . "\n";
+$adminPlain .= "Submitted : " . $submitted . "\n";
+$adminPlain .= "IP        : " . $ip . "\n";
+
+/* html */
+$adminHtml  = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+$adminHtml .= '<style>body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:0;}';
+$adminHtml .= '.wrap{max-width:620px;margin:28px auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.1);}';
+$adminHtml .= '.hdr{background:#060c18;padding:26px 30px;text-align:center;}';
+$adminHtml .= '.hdr h1{font-size:17px;color:#00d4ff;margin:0;letter-spacing:3px;font-family:Arial,sans-serif;}';
+$adminHtml .= '.hdr p{font-size:10px;color:#4a6280;margin:5px 0 0;letter-spacing:4px;}';
+$adminHtml .= '.bd{padding:26px 30px;}';
+$adminHtml .= '.sec{margin-bottom:22px;}';
+$adminHtml .= '.sec-t{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#1e78ff;border-bottom:1px solid #e8f0ff;padding-bottom:6px;margin-bottom:12px;}';
+$adminHtml .= '.row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;}';
+$adminHtml .= '.f{flex:1;min-width:130px;}';
+$adminHtml .= '.lb{font-size:10px;color:#999;margin-bottom:3px;}';
+$adminHtml .= '.vl{font-size:13px;color:#111;font-weight:600;}';
+$adminHtml .= '.msg{background:#f5f8ff;border-left:3px solid #1e78ff;padding:13px 15px;font-size:13px;line-height:1.75;color:#333;border-radius:0 6px 6px 0;white-space:pre-wrap;}';
+$adminHtml .= '.meta{background:#f0f4ff;padding:12px 30px;font-size:10px;color:#aaa;text-align:center;}';
+$adminHtml .= 'a{color:#1e78ff;}</style></head><body>';
+$adminHtml .= '<div class="wrap">';
+$adminHtml .= '<div class="hdr"><h1>ANOVEX TECHNOLOGIES</h1><p>NEW PROPOSAL RECEIVED</p></div>';
+$adminHtml .= '<div class="bd">';
+
+$adminHtml .= '<div class="sec"><div class="sec-t">Contact Information</div>';
+$adminHtml .= '<div class="row">';
+$adminHtml .= '<div class="f"><div class="lb">Full Name</div><div class="vl">' . $name . '</div></div>';
+$adminHtml .= '<div class="f"><div class="lb">Email</div><div class="vl"><a href="mailto:' . $email . '">' . $email . '</a></div></div>';
+$adminHtml .= '</div><div class="row">';
+$adminHtml .= '<div class="f"><div class="lb">Company</div><div class="vl">' . $co . '</div></div>';
+$adminHtml .= '<div class="f"><div class="lb">Phone</div><div class="vl">' . $ph . '</div></div>';
+$adminHtml .= '</div></div>';
+
+$adminHtml .= '<div class="sec"><div class="sec-t">Project Details</div>';
+$adminHtml .= '<div class="row">';
+$adminHtml .= '<div class="f"><div class="lb">Service Interest</div><div class="vl">' . $sv . '</div></div>';
+$adminHtml .= '<div class="f"><div class="lb">Budget Range</div><div class="vl">' . $bg . '</div></div>';
+$adminHtml .= '</div><div class="row">';
+$adminHtml .= '<div class="f"><div class="lb">Timeline</div><div class="vl">' . $tl . '</div></div>';
+$adminHtml .= '</div></div>';
+
+$adminHtml .= '<div class="sec"><div class="sec-t">Project Description</div>';
+$adminHtml .= '<div class="msg">' . $msgHtml . '</div>';
+$adminHtml .= '</div></div>';
+$adminHtml .= '<div class="meta">Submitted ' . $submitted . ' &nbsp;&middot;&nbsp; IP: ' . $ip . ' &nbsp;&middot;&nbsp; anovextechnologies.com</div>';
+$adminHtml .= '</div></body></html>';
+
+/* ================================================================
+   EMAIL 2 — CUSTOMER AUTO-REPLY (thank you)
+   ================================================================ */
+$customerSubject = 'We received your proposal — Anovex Technologies';
+
+$firstName = explode(' ', $name)[0];
+
+/* plain */
+$custPlain  = "Dear " . $firstName . ",\n\n";
+$custPlain .= "Thank you for reaching out to Anovex Technologies.\n\n";
+$custPlain .= "We have received your proposal and our team will review it carefully.\n";
+$custPlain .= "You can expect to hear from us within 24 hours.\n\n";
+$custPlain .= "Here is a summary of what we received:\n";
+$custPlain .= str_repeat('-', 38) . "\n";
+$custPlain .= "  Service  : " . $sv . "\n";
+$custPlain .= "  Budget   : " . $bg . "\n";
+$custPlain .= "  Timeline : " . $tl . "\n";
+$custPlain .= str_repeat('-', 38) . "\n\n";
+$custPlain .= "If you have any urgent questions, please contact us directly:\n";
+$custPlain .= "  Email : info@anovextechnologies.net\n";
+$custPlain .= "  Web   : https://anovextechnologies.com\n\n";
+$custPlain .= "Warm regards,\n";
+$custPlain .= "The Anovex Technologies Team\n";
+$custPlain .= "AI · ERP · GovTech · Analytics\n";
+
+/* html */
+$custHtml  = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+$custHtml .= '<style>body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:0;}';
+$custHtml .= '.wrap{max-width:600px;margin:28px auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.1);}';
+$custHtml .= '.hdr{background:#060c18;padding:30px;text-align:center;}';
+$custHtml .= '.hdr h1{font-size:17px;color:#00d4ff;margin:0 0 6px;letter-spacing:3px;}';
+$custHtml .= '.hdr p{font-size:10px;color:#4a6280;margin:0;letter-spacing:4px;}';
+$custHtml .= '.bd{padding:30px;}';
+$custHtml .= '.greeting{font-size:20px;font-weight:700;color:#111;margin-bottom:16px;}';
+$custHtml .= '.body-text{font-size:14px;color:#444;line-height:1.8;margin-bottom:20px;}';
+$custHtml .= '.summary{background:#f5f8ff;border:1px solid #dce8ff;border-radius:8px;padding:18px 20px;margin-bottom:24px;}';
+$custHtml .= '.sum-title{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#1e78ff;margin-bottom:12px;}';
+$custHtml .= '.sum-row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;}';
+$custHtml .= '.sum-key{color:#999;min-width:80px;font-size:12px;}';
+$custHtml .= '.sum-val{color:#222;font-weight:600;}';
+$custHtml .= '.cta-box{background:#060c18;border-radius:8px;padding:20px 22px;margin-bottom:24px;}';
+$custHtml .= '.cta-box p{font-size:13px;color:#6a82a8;margin:0 0 12px;line-height:1.6;}';
+$custHtml .= '.cta-btn{display:inline-block;background:#1e78ff;color:#fff;text-decoration:none;padding:10px 22px;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:1px;}';
+$custHtml .= '.sig{font-size:13px;color:#666;line-height:1.8;}';
+$custHtml .= '.sig strong{color:#111;}';
+$custHtml .= '.sig .tag{font-size:10px;color:#aaa;letter-spacing:2px;margin-top:4px;}';
+$custHtml .= '.ftr{background:#f0f4ff;padding:14px 30px;text-align:center;font-size:10px;color:#bbb;}';
+$custHtml .= 'a{color:#1e78ff;}</style></head><body>';
+$custHtml .= '<div class="wrap">';
+$custHtml .= '<div class="hdr"><h1>ANOVEX TECHNOLOGIES</h1><p>PROPOSAL CONFIRMATION</p></div>';
+$custHtml .= '<div class="bd">';
+$custHtml .= '<div class="greeting">Dear ' . $firstName . ',</div>';
+$custHtml .= '<div class="body-text">Thank you for contacting <strong>Anovex Technologies</strong>. We have successfully received your proposal and our team will review it carefully.<br><br>You can expect to hear back from us <strong>within 24 hours</strong> with next steps.</div>';
+
+$custHtml .= '<div class="summary">';
+$custHtml .= '<div class="sum-title">Your Proposal Summary</div>';
+$custHtml .= '<div class="sum-row"><span class="sum-key">Service</span><span class="sum-val">' . $sv . '</span></div>';
+$custHtml .= '<div class="sum-row"><span class="sum-key">Budget</span><span class="sum-val">' . $bg . '</span></div>';
+$custHtml .= '<div class="sum-row"><span class="sum-key">Timeline</span><span class="sum-val">' . $tl . '</span></div>';
+$custHtml .= '</div>';
+
+$custHtml .= '<div class="cta-box">';
+$custHtml .= '<p>Have an urgent question in the meantime? Our team is available and ready to help.</p>';
+$custHtml .= '<a href="mailto:info@anovextechnologies.net" class="cta-btn">Contact Us Directly</a>';
+$custHtml .= '</div>';
+
+$custHtml .= '<div class="sig">';
+$custHtml .= '<strong>Warm regards,</strong><br>';
+$custHtml .= 'The Anovex Technologies Team<br>';
+$custHtml .= '<div class="tag">AI &nbsp;&middot;&nbsp; ERP &nbsp;&middot;&nbsp; GOVTECH &nbsp;&middot;&nbsp; ANALYTICS</div>';
+$custHtml .= '</div></div>';
+$custHtml .= '<div class="ftr">&copy; ' . date('Y') . ' Anovex Technologies &nbsp;&middot;&nbsp; <a href="' . $siteUrl . '">' . $siteUrl . '</a></div>';
+$custHtml .= '</div></body></html>';
+
+/* ================================================================
+   DISPATCH BOTH EMAILS
+   ================================================================ */
+$sentAdmin    = sendEmail(
+    $adminEmail, $fromName,
+    $fromAddress, $fromName,
+    $email, $name,
+    $adminSubject, $adminPlain, $adminHtml
+);
+
+$sentCustomer = sendEmail(
+    $email, $name,
+    $fromAddress, $fromName,
+    $adminEmail, $fromName,
+    $customerSubject, $custPlain, $custHtml
+);
+
+/* ── Log if either failed ── */
+if (!$sentAdmin || !$sentCustomer) {
+    $log   = __DIR__ . '/mail_debug.log';
+    $entry = date('[Y-m-d H:i:s]')
+        . ' admin:' . ($sentAdmin    ? 'OK' : 'FAIL')
+        . ' customer:' . ($sentCustomer ? 'OK' : 'FAIL')
+        . ' to:' . $adminEmail . ' customer:' . $email . "\n";
     @file_put_contents($log, $entry, FILE_APPEND | LOCK_EX);
+}
 
-    /* Save submission so no data is lost */
-    $fallback = __DIR__ . '/submissions.log';
-    $save = date('[Y-m-d H:i:s]') . "\n" . $plain . str_repeat('-', 40) . "\n";
-    @file_put_contents($fallback, $save, FILE_APPEND | LOCK_EX);
+/* ── Always save submission locally as backup ── */
+$save  = __DIR__ . '/submissions.log';
+$entry = date('[Y-m-d H:i:s]') . "\n" . $adminPlain . str_repeat('-', 40) . "\n";
+@file_put_contents($save, $entry, FILE_APPEND | LOCK_EX);
 
+/* ── Response ── */
+if ($sentAdmin || $sentCustomer) {
+    echo json_encode([
+        'success' => true,
+        'message' => 'Thank you, ' . $firstName . '! Your proposal has been received. '
+                   . 'We\'ve sent a confirmation to ' . $email . ' and will be in touch within 24 hours.',
+    ]);
+} else {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'debug'   => $sendError, // remove in production
-        'message' => 'Mail could not be sent. Your submission has been saved. You can also reach us at info@anovextechnologies.net.',
+        'message' => 'Your submission was saved but mail could not be sent from this server. '
+                   . 'Please email us directly at info@anovextechnologies.net.',
     ]);
-    exit;
 }
-
-echo json_encode([
-    'success' => true,
-    'message' => 'Thank you, ' . $name . '! Your proposal has been received. We\'ll be in touch shortly.',
-]);
